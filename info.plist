@@ -6,6 +6,17 @@
 	<string>net.jamesoff.alfred.ynab</string>
 	<key>connections</key>
 	<dict>
+		<key>8CD6A9F8-4067-45B2-9E00-20AD9937D19D</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>CAACF668-E5B4-4C31-BC01-C0AD7B2EBDCC</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
 		<key>CAACF668-E5B4-4C31-BC01-C0AD7B2EBDCC</key>
 		<array>
 			<dict>
@@ -105,6 +116,27 @@
 			<dict>
 				<key>argumenttype</key>
 				<integer>0</integer>
+				<key>keyword</key>
+				<string>budgetlocation</string>
+				<key>subtext</key>
+				<string>Used for budget lookups</string>
+				<key>text</key>
+				<string>Set YNAB budget path</string>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>8CD6A9F8-4067-45B2-9E00-20AD9937D19D</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>keyword</key>
@@ -150,7 +182,12 @@ Uses ALP from https://github.com/phyllisstein/alp</string>
 		<key>3B8FCED4-B70A-48B1-ADF9-AD3340C9B531</key>
 		<dict>
 			<key>ypos</key>
-			<real>160</real>
+			<real>320</real>
+		</dict>
+		<key>8CD6A9F8-4067-45B2-9E00-20AD9937D19D</key>
+		<dict>
+			<key>ypos</key>
+			<real>170</real>
 		</dict>
 		<key>CAACF668-E5B4-4C31-BC01-C0AD7B2EBDCC</key>
 		<dict>
