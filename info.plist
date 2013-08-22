@@ -54,9 +54,9 @@
 			<key>config</key>
 			<dict>
 				<key>escaping</key>
-				<integer>127</integer>
+				<integer>4</integer>
 				<key>script</key>
-				<string>python configure.py {query}</string>
+				<string>python ./configure.py "{query}"</string>
 				<key>type</key>
 				<integer>0</integer>
 			</dict>
