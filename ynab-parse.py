@@ -16,8 +16,11 @@ Uses the alp library from https://github.com/phyllisstein/alp; thanks Daniel!
 import json
 import datetime
 import os.path
+import os
+import stat
 import locale
 import sys
+import time
 
 import alp
 
@@ -115,6 +118,7 @@ def get_monthly_budget(data, category):
         if subcategory["categoryId"] == category:
             return subcategory["budgeted"]
     return 0
+
 
 def get_overspending_handling(data, category):
     """
@@ -272,6 +276,15 @@ def check_for_budget(path):
     return result_path
 
 
+def load_cache():
+    try:
+        cache = json.load(open(alp.cache("cache.json")))
+        debug_print("Loaded cache")
+    except:
+        cache = None
+    return cache
+
+
 if __name__ == "__main__":   
     # If we have a setting for the location, use that
     s = alp.Settings()
@@ -294,10 +307,42 @@ if __name__ == "__main__":
 
     # Load data
     debug_print(path)
-    data = load_budget(path)
-    get_currency_symbol(data)
+    try:
+        file_info = os.stat(path)
+        modified_date = file_info.st_mtime
+    except:
+        pass
+    cache = load_cache()
+    cache_valid = False
+    if not cache is None:
+        if cache["path"] == path and cache["modified_date"] == modified_date:
+            debug_print("Cache is valid for this file")
+            try:
+                cache_date = cache["cache_date"]
+                cache_diff = int(time.time()) - cache_date
+                debug_print("cache diff is %d" % cache_diff)
+                if cache_diff < 30:
+                    cache_valid = True
+            except Exception, e:
+                pass
+    if not cache_valid:
+        cache = {
+                "path": path,
+                "modified_date": modified_date,
+                "entries": {}
+                }
 
-    all = all_categories(data)
+    if cache_valid:
+        debug_print("Using cache for categories")
+        all = cache["all_categories"]
+        get_currency_symbol({"budgetMetaData": { "currencyLocale": cache["currencyLocale"] } })
+        data = None
+    else:
+        data = load_budget(path)
+        get_currency_symbol(data)
+        all = all_categories(data)
+        cache["all_categories"] = all
+        cache["currencyLocale"] = data["budgetMetaData"]["currencyLocale"]
     query = alp.args()[0]
     results = alp.fuzzy_search(query, all, key = lambda x: '%s' % x["name"])
 
@@ -310,10 +355,21 @@ if __name__ == "__main__":
         if entityId == "":
             pass
         else:
-            ending_balance = new_walk_budget(data, entityId)
+            if cache_valid and entityId in cache["entries"]:
+                debug_print("Using cached entry")
+                ending_balance = cache["entries"][entityId]
+            else:
+                if data is None:
+                    debug_print("Lazy-loading data")
+                    data = load_budget(path)
+                ending_balance = new_walk_budget(data, entityId)
+                debug_print("Adding to cache")
+                cache["entries"][entityId] = ending_balance
 
             if ending_balance == None:
                 ending_balance = 0
+            else:
+                ending_balance = round(ending_balance, 2)
 
             if ending_balance < 0:
                 ending_text = "Overspent on %s this month!"
@@ -331,5 +387,13 @@ if __name__ == "__main__":
             items.append(i)
 
     alp.feedback(items)
+    if not cache is None:
+        try:
+            if "cache_date" not in cache:
+                cache["cache_date"] = int(time.time())
+            #debug_print(cache)
+            json.dump(cache, open(alp.cache("cache.json"), "w"))
+        except Exception, e:
+            pass
 
-    
+
