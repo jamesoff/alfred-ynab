@@ -69,11 +69,14 @@ def new_walk_budget(data, category):
         if budget < 0:
             debug_print("Category is overspent for this month!")
             osh = get_overspending_handling(month["monthlySubCategoryBudgets"], category)
+            debug_print("  Overspending handling is %s" % osh)
 
-            if not osh == None and (not osh.lower() == "confined"):
+            if (osh is None) or (not osh.lower() == "confined"):
                 debug_print("Resetting balance to 0")
                 saved_budget = budget
                 budget = 0
+            else:
+                debug_print("Carrying balance into next month")
 
     debug_print("Finished walking budget, balance is %0.2f" % budget)
     return budget
